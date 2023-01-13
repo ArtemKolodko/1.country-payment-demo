@@ -1,10 +1,11 @@
 import { makeAutoObservable } from "mobx";
 
-export type AppTheme = 'light' | 'dark'
+export const SubscriptionTimeout = 10 * 60 * 1000
 
 enum StorageKey {
     userAddress = 'userAddress',
-    isSubscribed = 'isSubscribed'
+    isSubscribed = 'isSubscribed',
+    subscriptionStart = 'subscriptionStart',
 }
 
 export class AccountStore {
@@ -13,8 +14,9 @@ export class AccountStore {
         this.init()
     }
 
-    public userAddress: string = '0x690b9a9e9aa1c9db991c7721a92d351db4fac990' // mocked address, same for every user
+    public userAddress: string = ''
     public isSubscribed: boolean = false
+    public subscriptionStart: number = 0
 
     init () {
         const userAddress = this.getStorageKey(StorageKey.userAddress)
@@ -23,17 +25,38 @@ export class AccountStore {
         }
         const isSubscribed = this.getStorageKey(StorageKey.isSubscribed)
         if(isSubscribed === 'true') {
-            this.setIsSubscribed(!!isSubscribed, false)
+            const timestamp = this.getStorageKey(StorageKey.subscriptionStart)
+            if(timestamp) {
+                const subscriptionStart = +timestamp
+                if(Date.now() - subscriptionStart < SubscriptionTimeout) {
+                    const subscriptionEnds = SubscriptionTimeout - (Date.now() - subscriptionStart)
+                    this.setIsSubscribed(!!isSubscribed, subscriptionStart,false)
+                    setTimeout(() => {
+                        this.setIsSubscribed(false, 0,true)
+                    }, subscriptionEnds)
+                    console.log('Subscription ends in ', subscriptionEnds / 1000, 's')
+                    return
+                }
+            }
         }
+        this.setIsSubscribed(false, 0,true)
     }
 
     public setAddress (address: string) {
         this.userAddress = address
     }
 
-    public setIsSubscribed (isSubscribed: boolean, updateStorage = true) {
+    public setIsSubscribed (isSubscribed: boolean, subscriptionStart = Date.now(), updateStorage = true) {
         this.isSubscribed = isSubscribed
-        this.setStorageKey(StorageKey.isSubscribed, String(isSubscribed))
+        this.subscriptionStart = subscriptionStart
+        if(updateStorage) {
+            this.setStorageKey(StorageKey.isSubscribed, String(isSubscribed))
+            this.setStorageKey(StorageKey.subscriptionStart, String(subscriptionStart))
+        }
+    }
+
+    public getSubscriptionEndTime () {
+        return this.subscriptionStart + SubscriptionTimeout
     }
 
     private setStorageKey (key: StorageKey, value: string) {

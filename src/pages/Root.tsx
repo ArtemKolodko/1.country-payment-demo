@@ -1,32 +1,47 @@
 import React, { useState } from 'react'
-import {Box, Button, Select, Image} from "grommet";
+import {Box, Button, Select, Image, Text} from "grommet";
+import Countdown from 'react-countdown';
 import {Description} from "../components/Description";
 import config from '../config'
 import { observer } from 'mobx-react';
 import { useStores } from '../hooks/useStores';
+import styled, { css } from 'styled-components';
 
-const ImageItem = (props: { name: string }) => {
-    return <Box
+const ImageContainer = styled(Box)<{ isLocked: boolean }>`
+  transition: transform 200ms;
+
+  ${({ isLocked }) => !isLocked && css`
+      :hover {
+        transform: scale(1.05);
+      }
+  `}
+
+  ${({ isLocked }) => isLocked && css`
+    filter: grayscale(100%);
+    opacity: 0.8;
+    cursor: default;
+  `}
+`
+
+const ListItem = (props: { name: string, isLocked: boolean, link: string }) => {
+    const { isLocked, name, link } = props
+
+    const onClick = () => {
+        if(!isLocked) {
+            window.open(link, '_blank')
+        }
+    }
+
+    return <ImageContainer
+        isLocked={isLocked}
         background={`url('${props.name}')`}
         height="350px"
         width="350px"
-    />
-}
-
-const ListItem = (props: { name: string, isLocked: boolean }) => {
-    const { isLocked, name } = props
-
-    const style = isLocked
-        ? { filter: 'grayscale(100%)' }
-        : {}
-
-    return <Box
         border={{ color: "brand", size: "1px" }}
+        round={'8px'}
         margin={{ bottom: '32px' }}
-        style={style}
-    >
-        <ImageItem name={name} />
-    </Box>
+        onClick={onClick}
+    />
 }
 
 export const Root = observer(() => {
@@ -55,22 +70,42 @@ export const Root = observer(() => {
             {/*    onChange={({ option }) => setPaymentMode(option)}*/}
             {/*/>*/}
             {accountStore.isSubscribed &&
-                <Button primary size={'large'} onClick={onUnsubscribeClicked}>
-                    Unsubscribe
-                </Button>
+                <Box direction={'row'} gap={'48px'} justify={'center'} align={'center'}>
+                    <Box>
+                        <Text size={'small'} color={'gray'}>Subscription status:</Text>
+                        <Text>Active</Text>
+                    </Box>
+                    <Box>
+                        <Text size={'small'} color={'gray'}>Subscription expire:</Text>
+                        <Countdown date={accountStore.getSubscriptionEndTime()} />
+                    </Box>
+                    <Box>
+                        <Button primary size={'large'} onClick={onUnsubscribeClicked}>
+                            Unsubscribe
+                        </Button>
+                    </Box>
+                </Box>
             }
             {!accountStore.isSubscribed &&
-                <Button primary size={'large'} onClick={onSubscribeClicked}>
-                    Subscribe to unlock content
-                </Button>
+                <Box direction={'row'} gap={'48px'} justify={'center'} align={'center'}>
+                    <Box>
+                        <Text size={'small'} color={'gray'}>Subscription status:</Text>
+                        <Text>Inactive</Text>
+                    </Box>
+                    <Box>
+                        <Button primary size={'large'} onClick={onSubscribeClicked}>
+                            Subscribe ($1)
+                        </Button>
+                    </Box>
+                </Box>
             }
         </Box>
         <Box direction={'row'} gap={'32px'} wrap>
-            <ListItem {...listItemProps} name={'image1.jpeg'} />
-            <ListItem {...listItemProps} name={'image2.jpeg'} />
-            <ListItem {...listItemProps} name={'image3.jpeg'} />
-            <ListItem {...listItemProps} name={'image4.jpeg'} />
-            <ListItem {...listItemProps} name={'image5.jpeg'} />
+            <ListItem {...listItemProps} name={'image1.jpeg'} link={'https://youtu.be/O1dgtYkfQZU'} />
+            <ListItem {...listItemProps} name={'image2.jpeg'} link={'https://youtu.be/LdWq6tBkstQ'} />
+            <ListItem {...listItemProps} name={'image3.jpeg'} link={'https://youtu.be/pb-j3svRQLI'} />
+            <ListItem {...listItemProps} name={'image4.jpeg'} link={'https://youtu.be/Ex2iAyaEElQ'} />
+            <ListItem {...listItemProps} name={'image5.jpeg'} link={'https://youtu.be/zdbPKzo2ShQ'} />
         </Box>
     </Box>
 })

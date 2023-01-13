@@ -10,6 +10,9 @@ export const theme = {
                 color: "transparent",
             },
         },
+        colors: {
+            brand: '#69fabd'
+        }
     },
     button: {
         primary: {

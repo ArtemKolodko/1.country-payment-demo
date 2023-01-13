@@ -10,6 +10,7 @@ export const Success = observer(() => {
 
     useEffect(() => {
         accountStore.setIsSubscribed(true)
+        window.open('/', '_self')
     }, [])
 
     return <Box>
