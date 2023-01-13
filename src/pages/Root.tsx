@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
-import {Box, Button, Select, Image, Text} from "grommet";
+import {Box, Button, Text} from "grommet";
 import Countdown from 'react-countdown';
-import {Description} from "../components/Description";
 import config from '../config'
 import { observer } from 'mobx-react';
 import { useStores } from '../hooks/useStores';
@@ -24,7 +23,7 @@ const ImageContainer = styled(Box)<{ isLocked: boolean }>`
 `
 
 const ListItem = (props: { name: string, isLocked: boolean, link: string }) => {
-    const { isLocked, name, link } = props
+    const { isLocked, link } = props
 
     const onClick = () => {
         if(!isLocked) {
@@ -46,7 +45,7 @@ const ListItem = (props: { name: string, isLocked: boolean, link: string }) => {
 
 export const Root = observer(() => {
     const { accountStore } = useStores()
-    const [paymentMode, setPaymentMode] = useState<'payment' | 'subscription'>('payment')
+    const [paymentMode] = useState<'payment' | 'subscription'>('payment')
 
     const checkoutLink = `${config.apiUrl}/stripe/checkout?mode=${paymentMode}`
     const onSubscribeClicked = () => window.open(checkoutLink, '_self')
