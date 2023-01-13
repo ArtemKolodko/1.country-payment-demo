@@ -71,10 +71,6 @@ export const Root = observer(() => {
             {accountStore.isSubscribed &&
                 <Box direction={'row'} gap={'48px'} justify={'center'} align={'center'}>
                     <Box>
-                        <Text size={'small'} color={'gray'}>Subscription status:</Text>
-                        <Text>Active</Text>
-                    </Box>
-                    <Box>
                         <Text size={'small'} color={'gray'}>Subscription expire:</Text>
                         <Countdown date={accountStore.getSubscriptionEndTime()} />
                     </Box>
@@ -87,10 +83,6 @@ export const Root = observer(() => {
             }
             {!accountStore.isSubscribed &&
                 <Box direction={'row'} gap={'48px'} justify={'center'} align={'center'}>
-                    <Box>
-                        <Text size={'small'} color={'gray'}>Subscription status:</Text>
-                        <Text>Inactive</Text>
-                    </Box>
                     <Box>
                         <Button primary size={'large'} onClick={onSubscribeClicked}>
                             Subscribe ($1)
