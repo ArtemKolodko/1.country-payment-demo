@@ -1,7 +1,6 @@
 import React, {useState} from "react";
 import {observer} from "mobx-react";
-import { Connect } from 'grommet-icons';
-import {Box, Button, DropButton, Layer, Text, TextInput} from "grommet";
+import {Box, Button, DropButton, Layer, Text} from "grommet";
 import {useStores} from "../hooks/useStores";
 import styled from "styled-components";
 
